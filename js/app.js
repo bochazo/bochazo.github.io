@@ -16,7 +16,7 @@ angular.module('ocampo', ['ngRoute'])
   .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
 
     $routeProvider
-      .when('/', { controller: 'HomeCtrl', templateUrl: '/site/home.html' })
+      .when('/', { controller: 'HomeCtrl', templateUrl: '/views/home.html' })
       .when('/busqueda', { controller: 'PlaceSearchCtrl', templateUrl: '/place/search.html' })
       .when('/listado', { controller: 'PlaceListCtrl', templateUrl: '/place/list.html' })
       .when('/mapa', { controller: 'MapCtrl', templateUrl: '/site/map.html' })
@@ -31,6 +31,13 @@ angular.module('ocampo', ['ngRoute'])
       .when('/404', { templateUrl: '/site/404.html' })
       .otherwise({ templateUrl: '/site/404.html' });
   }]);
+
+angular.module('ocampo').controller(
+    'HomeCtrl',
+    ['$scope', '$rootScope', '$location', '$window',
+    function ($scope, $rootScope, $location, $window) {
+        'use strict';
+    }]);
 
 },{"tableme":2}],2:[function(require,module,exports){
 (function(global) {
