@@ -15,7 +15,7 @@ angular.module('ocampo', ['ngRoute'])
   .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
 
     $routeProvider
-      .when('/', { controller: 'HomeCtrl', templateUrl: '/site/home.html' })
+      .when('/', { controller: 'HomeCtrl', templateUrl: '/views/home.html' })
       .when('/busqueda', { controller: 'PlaceSearchCtrl', templateUrl: '/place/search.html' })
       .when('/listado', { controller: 'PlaceListCtrl', templateUrl: '/place/list.html' })
       .when('/mapa', { controller: 'MapCtrl', templateUrl: '/site/map.html' })
