@@ -1,0 +1,30 @@
+{
+  "name": "ocampofutbol.github.io",
+  "version": "0.1.0",
+  "homepage": "ocampofutbol.github.io",
+  "authors": [
+    "Nicolás Escalante <nlante@gmail.com>"
+  ],
+  "description": "Ocampo Futbol Estadisticas",
+  "main": "main.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "ocampo",
+    "futbol",
+    "estadisticas"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.1"
+  }
+}
