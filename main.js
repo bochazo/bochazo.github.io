@@ -31,4 +31,9 @@ angular.module('ocampo', ['ngRoute'])
       .otherwise({ templateUrl: '/site/404.html' });
   }]);
 
-angular.module('ocampo').controller('HomeCtrl')
+angular.module('ocampo').controller(
+    'HomeCtrl',
+    ['$scope', '$rootScope', '$location', '$window',
+    function ($scope, $rootScope, $location, $window) {
+        'use strict';
+    }]);
