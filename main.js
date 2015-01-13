@@ -30,3 +30,5 @@ angular.module('ocampo', ['ngRoute'])
       .when('/404', { templateUrl: '/site/404.html' })
       .otherwise({ templateUrl: '/site/404.html' });
   }]);
+
+angular.module('ocampo').controller('HomeCtrl')
