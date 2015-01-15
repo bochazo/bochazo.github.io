@@ -1,5 +1,9 @@
 <ul>
   <li ng-repeat="match in matches">
     <a href="#/matches/{{match.id}}">{{match.name}}</a>
+
+    <div ng-repeat="player in match.players">
+      <p>{{player.name}}</p>
+    </div>
   </li>
 </ul>

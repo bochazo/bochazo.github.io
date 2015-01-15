@@ -11,5 +11,10 @@ function home($scope, $rootScope, $location, $window, db) {
 
     $scope.matches = matches;
     $scope.$apply();
+    $scope.matches.forEach(function (match) {
+      match.fetch(function (err, data) {
+        $scope.$apply();
+      });
+    });
   });
 }

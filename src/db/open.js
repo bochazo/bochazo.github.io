@@ -1,5 +1,6 @@
 var table = require('gsx');
 var contra = require('contra');
+var transform = require('./transform.js');
 
 module.exports = open;
 
@@ -23,6 +24,6 @@ function open(docs, done) {
       return;
     }
 
-    done(null, results.reduce(function (x, y) { return x.concat(y); }, []));
+    done(null, transform(results));
   });
 }
