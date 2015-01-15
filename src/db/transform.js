@@ -6,22 +6,34 @@ function transform(results) {
   return results
     .reduce(function (x, y) { return x.concat(y); }, [])
     .map(function (match) {
+      var isFetching = false;
+      var callbacks = [];
+
       return {
         id: match.id,
         name: match.name,
         fetch: function (cb) {
           var self = this;
 
-          if (self.list) {
-            cb(null, self.list);
+          if (self.players) {
+            cb(null, self);
             return;
           }
 
+          callbacks.push(cb);
+
+          if (isFetching) {
+            return;
+          }
+
+          isFetching = true;
           match.fetch(function (err, data) {
             var teams;
 
             if (err) {
-              cb(err);
+              callbacks.forEach(function (callback) {
+                callback(err);
+              });
               return;
             }
 
@@ -62,7 +74,10 @@ function transform(results) {
               self.teams = [];
             }
 
-            cb(null, self.list);
+            callbacks.forEach(function (callback) {
+              callback(null, self);
+            });
+            return;
           });
         }
       };
