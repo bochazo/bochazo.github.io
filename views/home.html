@@ -1,3 +1,5 @@
-<div>
-  <p>Testing views</p>
-</div>
+<ul>
+  <li ng-repeat="match in matches">
+    <a href="#/matches/{{match.id}}">{{match.name}}</a>
+  </li>
+</ul>
