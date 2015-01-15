@@ -9,8 +9,6 @@ function home($scope, $rootScope, $location, $window, db) {
       return;
     }
 
-    console.log(matches);
-
     $scope.matches = matches;
     $scope.$apply();
   });

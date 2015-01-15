@@ -5,6 +5,7 @@ var controllers = require('./controllers');
 
 bchz.value('db', db);
 bchz.controller('HomeCtrl', controllers.home);
+bchz.controller('PlayerCtrl', controllers.player);
 
 function initialize(err, book) {
   if (err) {

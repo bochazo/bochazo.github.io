@@ -68,7 +68,7 @@ function transform(results) {
                       return player.own;
                     }).reduce(function (a, b) { return a + b; }, 0),
                   detail: team.filter(function (player) {
-                      return player.goal || player.headed || player.freeKick || player.penalty;
+                      return player.total;
                     }).concat(self.starters.filter(function (player) { return player.team != team.key && player.own; }))
                 },
                 assists: team.filter(function (player) { return player.assists; })
