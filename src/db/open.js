@@ -18,7 +18,7 @@ function open(docs, done) {
     };
   });
 
-  contra.concurrent(tasks, function (err, results) {
+  contra.concurrent(tasks, 4, function (err, results) {
     if (err) {
       done(err);
       return;

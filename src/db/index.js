@@ -43,7 +43,6 @@ module.exports = function (docs) {
       var fns = data.map(function (item) { return function(callback) { item.fetch(callback); }; });
 
       contra.concurrent(fns, function (err, results) {
-        console.log("vamo")
         if (err) {
           cb(err);
           return;
