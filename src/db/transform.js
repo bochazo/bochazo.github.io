@@ -6,7 +6,7 @@ function transform(results) {
   return results
     .reduce(function (x, y) { return x.concat(y); }, [])
     .map(function (match) {
-      var isFetching = false;
+      var isFetching;
       var callbacks = [];
 
       return {
@@ -60,11 +60,16 @@ function transform(results) {
                 players: team,
                 goals: {
                   count: team.map(function (player) {
-                      return player.goal + player.headed + player.freeKick + player.penalty - player.own;
-                    }).reduce(function (a, b) { return a + b; }),
+                      return player.total;
+                    }).reduce(function (a, b) { return a + b; }, 0) +
+                    self.starters.filter(function (player) {
+                      return player.team != team.key && player.own;
+                    }).map(function (player) {
+                      return player.own;
+                    }).reduce(function (a, b) { return a + b; }, 0),
                   detail: team.filter(function (player) {
-                      return player.goal || player.headed || player.freeKick || player.penalty || player.own;
-                    })
+                      return player.goal || player.headed || player.freeKick || player.penalty;
+                    }).concat(self.starters.filter(function (player) { return player.team != team.key && player.own; }))
                 },
                 assists: team.filter(function (player) { return player.assists; })
               };

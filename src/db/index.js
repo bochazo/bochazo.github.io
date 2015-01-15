@@ -1,9 +1,14 @@
+var contra = require('contra');
 var open = require('./open.js');
 var content;
 
 module.exports = function (docs) {
+  var isFetching;
+  var callbacks = [];
+
   return {
-    fetch: fetch
+    fetch: fetch,
+    fetchAll: fetchAll
   };
 
   function fetch(cb) {
@@ -12,14 +17,40 @@ module.exports = function (docs) {
       return;
     }
 
+    callbacks.push(cb);
+
+    if (isFetching) {
+      return;
+    }
+
     open(docs, function (err, data) {
       if (err) {
-        cb(err);
+        callbacks.forEach(function (callback) {
+          callback(err);
+        });
         return;
       }
 
       content = data;
-      cb(null, data);
+      callbacks.forEach(function (callback) {
+        callback(null, data);
+      });
+    });
+  }
+
+  function fetchAll(cb) {
+    fetch(function (err, data) {
+      var fns = data.map(function (item) { return function(callback) { item.fetch(callback); }; });
+
+      contra.concurrent(fns, function (err, results) {
+        console.log("vamo")
+        if (err) {
+          cb(err);
+          return;
+        }
+
+        cb(null, results);
+      });
     });
   }
 };
