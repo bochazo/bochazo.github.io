@@ -24,6 +24,7 @@ function player($scope, $rootScope, $routeParams, $location, $window, db) {
     $scope.matches = info;
     $scope.assists = va(info).sum(function (item) { return item.assists; });
     $scope.goals = va(info).sum(function (item) { return item.total; });
+    $scope.average = ($scope.goals / $scope.matches.length).toFixed(2);
     $scope.$apply();
   });
 }
