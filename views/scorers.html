@@ -1,0 +1,18 @@
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Goles</th>
+      <th>Partidos jugados</th>
+      <th>Promedio de gol</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="player in players">
+      <td>{{player.name}}</td>
+      <td>{{player.goals}}</td>
+      <td>{{player.matches}}</td>
+      <td>{{player.average}}</td>
+    </tr>
+  </tbody>
+</table>

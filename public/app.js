@@ -936,10 +936,11 @@ function home($scope, $rootScope, $location, $window, db) {
 },{}],14:[function(require,module,exports){
 module.exports = {
   home: require('./home.js'),
-  player: require('./player.js')
+  player: require('./player.js'),
+  scorers: require('./scorers.js')
 };
 
-},{"./home.js":13,"./player.js":15}],15:[function(require,module,exports){
+},{"./home.js":13,"./player.js":15,"./scorers.js":16}],15:[function(require,module,exports){
 var va = require('very-array');
 
 module.exports = ['$scope', '$rootScope', '$routeParams', '$location', '$window', 'db', player];
@@ -972,6 +973,40 @@ function player($scope, $rootScope, $routeParams, $location, $window, db) {
 }
 
 },{"very-array":12}],16:[function(require,module,exports){
+var va = require('very-array');
+
+module.exports = ['$scope', '$rootScope', '$routeParams', '$location', '$window', 'db', scorers];
+
+function scorers($scope, $rootScope, $routeParams, $location, $window, db) {
+  'use strict';
+
+  db.fetchAll(function (err, matches) {
+    var info;
+
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    $scope.players = va(matches).selectMany(function (match) {
+      return match.players;
+    }).groupBy(function (player) {
+      return player.name;
+    }).map(function (player) {
+      return {
+        name: player.name,
+        goals: va(player).sum(function (item) { return item.total; }),
+        matches: player.length,
+        assists: va(player).sum(function (item) { return item.assists; }),
+        average: (va(player).sum(function (item) { return item.total; }) / player.length).toFixed(2),
+        detail: player
+      };
+    });
+    $scope.$apply();
+  });
+}
+
+},{"very-array":12}],17:[function(require,module,exports){
 var contra = require('contra');
 var open = require('./open.js');
 var content;
@@ -1028,7 +1063,7 @@ module.exports = function (docs) {
   }
 };
 
-},{"./open.js":17,"contra":3}],17:[function(require,module,exports){
+},{"./open.js":18,"contra":3}],18:[function(require,module,exports){
 var table = require('gsx');
 var contra = require('contra');
 var transform = require('./transform.js');
@@ -1059,7 +1094,7 @@ function open(docs, done) {
   });
 }
 
-},{"./transform.js":18,"contra":3,"gsx":5}],18:[function(require,module,exports){
+},{"./transform.js":19,"contra":3,"gsx":5}],19:[function(require,module,exports){
 var _ = require('very-array');
 
 module.exports = transform;
@@ -1151,7 +1186,7 @@ function transform(results) {
     });
 }
 
-},{"very-array":12}],19:[function(require,module,exports){
+},{"very-array":12}],20:[function(require,module,exports){
 var docs = require('../docs.json');
 var db = require('./db')(docs);
 var bchz = require('./modules').bchz;
@@ -1160,6 +1195,7 @@ var controllers = require('./controllers');
 bchz.value('db', db);
 bchz.controller('HomeCtrl', controllers.home);
 bchz.controller('PlayerCtrl', controllers.player);
+bchz.controller('ScorersCtrl', controllers.scorers);
 
 function initialize(err, book) {
   if (err) {
@@ -1168,20 +1204,21 @@ function initialize(err, book) {
   }
 }
 
-},{"../docs.json":1,"./controllers":14,"./db":16,"./modules":21}],20:[function(require,module,exports){
+},{"../docs.json":1,"./controllers":14,"./db":17,"./modules":22}],21:[function(require,module,exports){
 module.exports = angular.module('bchz', ['ngRoute'])
   .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
 
     $routeProvider
       .when('/', { controller: 'HomeCtrl', templateUrl: '/views/home.html' })
       .when('/players/:name', { controller: 'PlayerCtrl', templateUrl: '/views/player.html' })
+      .when('/scorers', { controller: 'ScorersCtrl', templateUrl: '/views/scorers.html' })
       .when('/404', { templateUrl: '/site/404.html' })
       .otherwise({ templateUrl: '/site/404.html' });
   }]);
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = {
   bchz: require('./bchz.js')
 };
 
-},{"./bchz.js":20}]},{},[19]);
+},{"./bchz.js":21}]},{},[20]);
