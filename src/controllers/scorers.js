@@ -19,7 +19,7 @@ function scorers($scope, $rootScope, $routeParams, $location, $window, db) {
       return player.name;
     }).map(function (player) {
       return {
-        name: player.name,
+        name: player.key,
         goals: va(player).sum(function (item) { return item.total; }),
         matches: player.length,
         assists: va(player).sum(function (item) { return item.assists; }),
