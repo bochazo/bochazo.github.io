@@ -992,7 +992,7 @@ function scorers($scope, $rootScope, $routeParams, $location, $window, db) {
       return match.players;
     }).groupBy(function (player) {
       return player.name;
-    }).map(function (player) {
+    }).select(function (player) {
       return {
         name: player.key,
         goals: va(player).sum(function (item) { return item.total; }),
@@ -1001,6 +1001,8 @@ function scorers($scope, $rootScope, $routeParams, $location, $window, db) {
         average: (va(player).sum(function (item) { return item.total; }) / player.length).toFixed(2),
         detail: player
       };
+    }).orderByDescending(function (player) {
+      return player.goals;
     });
     $scope.$apply();
   });
