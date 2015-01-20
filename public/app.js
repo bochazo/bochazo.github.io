@@ -1001,6 +1001,8 @@ function scorers($scope, $rootScope, $routeParams, $location, $window, db) {
         average: (va(player).sum(function (item) { return item.total; }) / player.length).toFixed(2),
         detail: player
       };
+    }).where(function (player) {
+      return player.goals;
     }).orderByDescending(function (player) {
       return player.goals;
     });
