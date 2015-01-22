@@ -1,6 +1,8 @@
+'use strict';
+
 var table = require('gsx');
 var contra = require('contra');
-var transform = require('./transform.js');
+var matches = require('./matches.js');
 
 module.exports = open;
 
@@ -24,6 +26,6 @@ function open(docs, done) {
       return;
     }
 
-    done(null, transform(results));
+    done(null, matches(results));
   });
 }

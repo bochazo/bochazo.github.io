@@ -1,4 +1,4 @@
-var va = require('very-array');
+var _ = require('very-array');
 
 module.exports = ['$scope', '$rootScope', '$routeParams', '$location', '$window', 'db', player];
 
@@ -7,7 +7,7 @@ function player($scope, $rootScope, $routeParams, $location, $window, db) {
 
   $scope.name = $routeParams.name;
 
-  db.fetchAll(function (err, matches) {
+  db.fetchAll(function (err, schema) {
     var info;
 
     if (err) {
@@ -15,16 +15,14 @@ function player($scope, $rootScope, $routeParams, $location, $window, db) {
       return;
     }
 
-    var info = va(matches).selectMany(function (match) {
-      return match.players;
-    }).filter(function (player) {
+    info = _(schema.players).filter(function (player) {
       return player.name === $routeParams.name;
-    });
+    })[0] || {};
 
-    $scope.matches = info;
-    $scope.assists = va(info).sum(function (item) { return item.assists; });
-    $scope.goals = va(info).sum(function (item) { return item.total; });
-    $scope.average = ($scope.goals / $scope.matches.length).toFixed(2);
+    $scope.matches = info.matches;
+    $scope.assists = info.assists;
+    $scope.goals = info.goals;
+    $scope.average = info.average && info.average.toFixed(2);
     $scope.$apply();
   });
 }

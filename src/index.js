@@ -1,3 +1,5 @@
+'use strict';
+
 var docs = require('../docs.json');
 var db = require('./db')(docs);
 var bchz = require('./modules').bchz;

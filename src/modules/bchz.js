@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = angular.module('bchz', ['ngRoute'])
   .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
 

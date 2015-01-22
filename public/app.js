@@ -922,13 +922,13 @@ module.exports = ['$scope', '$rootScope', '$location', '$window', 'db', home];
 function home($scope, $rootScope, $location, $window, db) {
   'use strict';
 
-  db.fetchAll(function (err, matches) {
+  db.fetchAll(function (err, schema) {
     if (err) {
       console.error(err);
       return;
     }
 
-    $scope.matches = matches;
+    $scope.matches = schema.matches;
     $scope.$apply();
   });
 }
@@ -941,7 +941,7 @@ module.exports = {
 };
 
 },{"./home.js":13,"./player.js":15,"./scorers.js":16}],15:[function(require,module,exports){
-var va = require('very-array');
+var _ = require('very-array');
 
 module.exports = ['$scope', '$rootScope', '$routeParams', '$location', '$window', 'db', player];
 
@@ -950,7 +950,7 @@ function player($scope, $rootScope, $routeParams, $location, $window, db) {
 
   $scope.name = $routeParams.name;
 
-  db.fetchAll(function (err, matches) {
+  db.fetchAll(function (err, schema) {
     var info;
 
     if (err) {
@@ -958,29 +958,27 @@ function player($scope, $rootScope, $routeParams, $location, $window, db) {
       return;
     }
 
-    var info = va(matches).selectMany(function (match) {
-      return match.players;
-    }).filter(function (player) {
+    info = _(schema.players).filter(function (player) {
       return player.name === $routeParams.name;
-    });
+    })[0] || {};
 
-    $scope.matches = info;
-    $scope.assists = va(info).sum(function (item) { return item.assists; });
-    $scope.goals = va(info).sum(function (item) { return item.total; });
-    $scope.average = ($scope.goals / $scope.matches.length).toFixed(2);
+    $scope.matches = info.matches;
+    $scope.assists = info.assists;
+    $scope.goals = info.goals;
+    $scope.average = info.average && info.average.toFixed(2);
     $scope.$apply();
   });
 }
 
 },{"very-array":12}],16:[function(require,module,exports){
-var va = require('very-array');
+var _ = require('very-array');
 
 module.exports = ['$scope', '$rootScope', '$routeParams', '$location', '$window', 'db', scorers];
 
 function scorers($scope, $rootScope, $routeParams, $location, $window, db) {
   'use strict';
 
-  db.fetchAll(function (err, matches) {
+  db.fetchAll(function (err, schema) {
     var info;
 
     if (err) {
@@ -988,20 +986,7 @@ function scorers($scope, $rootScope, $routeParams, $location, $window, db) {
       return;
     }
 
-    $scope.players = va(matches).selectMany(function (match) {
-      return match.players;
-    }).groupBy(function (player) {
-      return player.name;
-    }).select(function (player) {
-      return {
-        name: player.key,
-        goals: va(player).sum(function (item) { return item.total; }),
-        matches: player.length,
-        assists: va(player).sum(function (item) { return item.assists; }),
-        average: (va(player).sum(function (item) { return item.total; }) / player.length).toFixed(2),
-        detail: player
-      };
-    }).where(function (player) {
+    $scope.players = _(schema.players).where(function (player) {
       return player.goals;
     }).orderByDescending(function (player) {
       return player.goals;
@@ -1011,8 +996,11 @@ function scorers($scope, $rootScope, $routeParams, $location, $window, db) {
 }
 
 },{"very-array":12}],17:[function(require,module,exports){
+'use strict';
+
 var contra = require('contra');
-var open = require('./open.js');
+var load = require('./open.js');
+var players = require('./players.js');
 var content;
 
 module.exports = function (docs) {
@@ -1036,7 +1024,7 @@ module.exports = function (docs) {
       return;
     }
 
-    open(docs, function (err, data) {
+    load(docs, function (err, data) {
       if (err) {
         callbacks.forEach(function (callback) {
           callback(err);
@@ -1061,49 +1049,23 @@ module.exports = function (docs) {
           return;
         }
 
-        cb(null, results);
+        cb(null, {
+          matches: results,
+          players: players(results)
+        });
       });
     });
   }
 };
 
-},{"./open.js":18,"contra":3}],18:[function(require,module,exports){
-var table = require('gsx');
-var contra = require('contra');
-var transform = require('./transform.js');
+},{"./open.js":19,"./players.js":20,"contra":3}],18:[function(require,module,exports){
+'use strict';
 
-module.exports = open;
-
-function open(docs, done) {
-  var tasks = docs.map(function (doc) {
-    return function(cb) {
-      table(doc, function (err, data) {
-        if (err) {
-          cb(err);
-          return;
-        }
-
-        cb(null, data.sheets);
-      });
-    };
-  });
-
-  contra.concurrent(tasks, 4, function (err, results) {
-    if (err) {
-      done(err);
-      return;
-    }
-
-    done(null, transform(results));
-  });
-}
-
-},{"./transform.js":19,"contra":3,"gsx":5}],19:[function(require,module,exports){
 var _ = require('very-array');
 
-module.exports = transform;
+module.exports = matches;
 
-function transform(results) {
+function matches(results) {
   return results
     .reduce(function (x, y) { return x.concat(y); }, [])
     .map(function (match) {
@@ -1128,69 +1090,150 @@ function transform(results) {
           }
 
           isFetching = true;
-          match.fetch(function (err, data) {
-            var teams;
-
-            if (err) {
-              callbacks.forEach(function (callback) {
-                callback(err);
-              });
-              return;
-            }
-
-            self.players = data.map(function (player, ix) {
-              return {
-                name: player.jugador,
-                assists: +player.asistencias,
-                goal: +player.jugada,
-                headed: +player.cabeza,
-                freeKick: +player.tirolibre,
-                penalty: +player.penal,
-                total: +player.jugada + +player.cabeza + +player.tirolibre + +player.penal,
-                own: +player.encontra,
-                team: player.equipo,
-                substitute: ix >= 22
-              };
-            });
-
-            self.starters = self.players.filter(function (player) { return !player.substitute; });
-            self.substitutes = self.players.filter(function (player) { return player.substitute; });
-            self.teams = _(self.starters).groupBy(function (player) { return player.team; }).map(function (team) {
-              return {
-                name: team.key,
-                players: team,
-                goals: {
-                  count: team.map(function (player) {
-                      return player.total;
-                    }).reduce(function (a, b) { return a + b; }, 0) +
-                    self.starters.filter(function (player) {
-                      return player.team != team.key && player.own;
-                    }).map(function (player) {
-                      return player.own;
-                    }).reduce(function (a, b) { return a + b; }, 0),
-                  detail: team.filter(function (player) {
-                      return player.total;
-                    }).concat(self.starters.filter(function (player) { return player.team != team.key && player.own; }))
-                },
-                assists: team.filter(function (player) { return player.assists; })
-              };
-            });
-
-            if (self.teams.length === 1) {
-              self.teams = [];
-            }
-
-            callbacks.forEach(function (callback) {
-              callback(null, self);
-            });
-            return;
-          });
+          match.fetch(function (err, data) { getMatches.call(self, err, data); });
         }
+      };
+
+      function getMatches(err, data) {
+        var self = this;
+        var teams;
+
+        if (err) {
+          callbacks.forEach(function (callback) {
+            callback(err);
+          });
+          return;
+        }
+
+        self.players = data.map(getPlayer);
+        self.starters = self.players.filter(function (player) { return !player.substitute; });
+        self.substitutes = self.players.filter(function (player) { return player.substitute; });
+        self.teams = getTeams(self.starters);
+
+        if (self.teams.length === 1) {
+          self.teams = [];
+        }
+
+        callbacks.forEach(function (callback) {
+          callback(null, self);
+        });
+
+        return;
+      }
+    });
+
+  function getTeams(starters) {
+    return _(starters)
+      .groupBy(function (player) { return player.team; })
+      .map(function (team) {
+        return {
+          name: team.key,
+          players: team,
+          goals: {
+            count: sumGoals(team, starters),
+            detail: getGoalsDetail(team, starters)
+          },
+          assists: team.filter(function (player) { return player.assists; })
+        };
+      });
+  }
+
+  function getGoalsDetail(team, starters) {
+    return team
+      .filter(function (player) {
+        return player.total;
+      }).concat(starters.filter(function (player) { return player.team !== team.key && player.own; }));
+  }
+
+  function sumGoals(team, starters) {
+    return team
+      .map(function (player) {
+        return player.total;
+      }).reduce(function (a, b) { return a + b; }, 0) +
+      starters.filter(function (player) {
+        return player.team !== team.key && player.own;
+      }).map(function (player) {
+        return player.own;
+      }).reduce(function (a, b) { return a + b; }, 0);
+  }
+
+  function getPlayer (player, ix) {
+    return {
+      name: player.jugador,
+      assists: (+player.asistencias),
+      goal: (+player.jugada),
+      headed: (+player.cabeza),
+      freeKick: (+player.tirolibre),
+      penalty: (+player.penal),
+      total: (+player.jugada + (+player.cabeza) + (+player.tirolibre) + (+player.penal)),
+      own: (+player.encontra),
+      team: player.equipo,
+      substitute: ix >= 22
+    };
+  }
+}
+
+},{"very-array":12}],19:[function(require,module,exports){
+'use strict';
+
+var table = require('gsx');
+var contra = require('contra');
+var matches = require('./matches.js');
+
+module.exports = open;
+
+function open(docs, done) {
+  var tasks = docs.map(function (doc) {
+    return function(cb) {
+      table(doc, function (err, data) {
+        if (err) {
+          cb(err);
+          return;
+        }
+
+        cb(null, data.sheets);
+      });
+    };
+  });
+
+  contra.concurrent(tasks, 4, function (err, results) {
+    if (err) {
+      done(err);
+      return;
+    }
+
+    done(null, matches(results));
+  });
+}
+
+},{"./matches.js":18,"contra":3,"gsx":5}],20:[function(require,module,exports){
+'use strict';
+
+var _ = require('very-array');
+
+module.exports = players;
+
+function players(source) {
+  _(source)
+    .selectMany(function (match) {
+      return match.players;
+    }).groupBy(function (player) {
+      return player.name;
+    }).select(function (player) {
+      return {
+        name: player.key,
+        goals: _(player).sum(function (item) { return item.total; }),
+        matches: player.where(function (item) { return !item.substitute; }).length,
+        assists: _(player).sum(function (item) { return item.assists; }),
+        average: _(player).sum(function (item) { return item.total; }) / player.where(function (item) { return !item.substitute; }).length,
+        detail: player
       };
     });
 }
 
-},{"very-array":12}],20:[function(require,module,exports){
+},{"very-array":12}],21:[function(require,module,exports){
+'use strict';
+
 var docs = require('../docs.json');
 var db = require('./db')(docs);
 var bchz = require('./modules').bchz;
@@ -1208,7 +1251,9 @@ function initialize(err, book) {
   }
 }
 
-},{"../docs.json":1,"./controllers":14,"./db":17,"./modules":22}],21:[function(require,module,exports){
+},{"../docs.json":1,"./controllers":14,"./db":17,"./modules":23}],22:[function(require,module,exports){
+'use strict';
+
 module.exports = angular.module('bchz', ['ngRoute'])
   .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
 
@@ -1220,9 +1265,9 @@ module.exports = angular.module('bchz', ['ngRoute'])
       .otherwise({ templateUrl: '/site/404.html' });
   }]);
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = {
   bchz: require('./bchz.js')
 };
 
-},{"./bchz.js":21}]},{},[20]);
+},{"./bchz.js":22}]},{},[21]);

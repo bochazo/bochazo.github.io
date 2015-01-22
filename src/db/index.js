@@ -1,5 +1,8 @@
+'use strict';
+
 var contra = require('contra');
-var open = require('./open.js');
+var load = require('./open.js');
+var players = require('./players.js');
 var content;
 
 module.exports = function (docs) {
@@ -23,7 +26,7 @@ module.exports = function (docs) {
       return;
     }
 
-    open(docs, function (err, data) {
+    load(docs, function (err, data) {
       if (err) {
         callbacks.forEach(function (callback) {
           callback(err);
@@ -48,7 +51,10 @@ module.exports = function (docs) {
           return;
         }
 
-        cb(null, results);
+        cb(null, {
+          matches: results,
+          players: players(results)
+        });
       });
     });
   }
