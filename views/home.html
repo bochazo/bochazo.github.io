@@ -6,6 +6,7 @@
     <li>
       <h4>{{team.name}} - {{team.goals.count}}</h4>
       <p><span ng-repeat="detail in team.goals.detail"><a href="#/players/{{detail.name}}">{{detail.name}}</a>{{detail.total > 1 ? ' (' + detail.total + ')' : ''}}{{detail.team !== team.name ? ' (EC)' : ''}}{{$last ? '' : ', '}}</span></p>
+      <hr>
     </li>
   </ul>
 </div>
