@@ -8,14 +8,12 @@ function player($scope, $rootScope, $routeParams, $location, $window, db) {
   $scope.name = $routeParams.name;
 
   db.fetchAll(function (err, schema) {
-    var info;
-
     if (err) {
       console.error(err);
       return;
     }
 
-    info = _(schema.players).filter(function (player) {
+    var info = _(schema.players).filter(function (player) {
       return player.name === $routeParams.name;
     })[0] || {};
 

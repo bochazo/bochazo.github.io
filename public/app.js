@@ -937,10 +937,31 @@ function home($scope, $rootScope, $location, $window, db) {
 module.exports = {
   home: require('./home.js'),
   player: require('./player.js'),
-  scorers: require('./scorers.js')
+  scorers: require('./scorers.js'),
+  match: require('./match.js')
 };
 
-},{"./home.js":13,"./player.js":15,"./scorers.js":16}],15:[function(require,module,exports){
+},{"./home.js":13,"./match.js":15,"./player.js":16,"./scorers.js":17}],15:[function(require,module,exports){
+module.exports = ['$scope', '$rootScope', '$routeParams', '$location', '$window', 'db', match];
+
+function match($scope, $rootScope, $routeParams, $location, $window, db) {
+  'use strict';
+
+  db.fetchAll(function (err, schema) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    var match = schema.matches.filter(function (match) { return match.id === $routeParams.id; })[0] || {};
+
+    $scope.name = match.name;
+    $scope.teams = match.teams;
+    $scope.$apply();
+  });
+}
+
+},{}],16:[function(require,module,exports){
 var _ = require('very-array');
 
 module.exports = ['$scope', '$rootScope', '$routeParams', '$location', '$window', 'db', player];
@@ -951,14 +972,12 @@ function player($scope, $rootScope, $routeParams, $location, $window, db) {
   $scope.name = $routeParams.name;
 
   db.fetchAll(function (err, schema) {
-    var info;
-
     if (err) {
       console.error(err);
       return;
     }
 
-    info = _(schema.players).filter(function (player) {
+    var info = _(schema.players).filter(function (player) {
       return player.name === $routeParams.name;
     })[0] || {};
 
@@ -970,7 +989,7 @@ function player($scope, $rootScope, $routeParams, $location, $window, db) {
   });
 }
 
-},{"very-array":12}],16:[function(require,module,exports){
+},{"very-array":12}],17:[function(require,module,exports){
 var _ = require('very-array');
 
 module.exports = ['$scope', '$rootScope', '$routeParams', '$location', '$window', 'db', scorers];
@@ -979,23 +998,21 @@ function scorers($scope, $rootScope, $routeParams, $location, $window, db) {
   'use strict';
 
   db.fetchAll(function (err, schema) {
-    var info;
-
     if (err) {
       console.error(err);
       return;
     }
 
     $scope.players = _(schema.players).where(function (player) {
-      return player.goals;
-    }).orderByDescending(function (player) {
-      return player.goals;
-    });
+        return player.goals;
+      }).orderByDescending(function (player) {
+        return player.goals;
+      });
     $scope.$apply();
   });
 }
 
-},{"very-array":12}],17:[function(require,module,exports){
+},{"very-array":12}],18:[function(require,module,exports){
 'use strict';
 
 var contra = require('contra');
@@ -1058,7 +1075,7 @@ module.exports = function (docs) {
   }
 };
 
-},{"./open.js":19,"./players.js":20,"contra":3}],18:[function(require,module,exports){
+},{"./open.js":20,"./players.js":21,"contra":3}],19:[function(require,module,exports){
 'use strict';
 
 var _ = require('very-array');
@@ -1174,7 +1191,7 @@ function matches(results) {
   }
 }
 
-},{"very-array":12}],19:[function(require,module,exports){
+},{"very-array":12}],20:[function(require,module,exports){
 'use strict';
 
 var table = require('gsx');
@@ -1207,7 +1224,7 @@ function open(docs, done) {
   });
 }
 
-},{"./matches.js":18,"contra":3,"gsx":5}],20:[function(require,module,exports){
+},{"./matches.js":19,"contra":3,"gsx":5}],21:[function(require,module,exports){
 'use strict';
 
 var _ = require('very-array');
@@ -1232,7 +1249,7 @@ function players(source) {
     });
 }
 
-},{"very-array":12}],21:[function(require,module,exports){
+},{"very-array":12}],22:[function(require,module,exports){
 'use strict';
 
 var docs = require('../docs.json');
@@ -1243,6 +1260,7 @@ var controllers = require('./controllers');
 bchz.value('db', db);
 bchz.controller('HomeCtrl', controllers.home);
 bchz.controller('PlayerCtrl', controllers.player);
+bchz.controller('MatchCtrl', controllers.match);
 bchz.controller('ScorersCtrl', controllers.scorers);
 
 function initialize(err, book) {
@@ -1252,7 +1270,7 @@ function initialize(err, book) {
   }
 }
 
-},{"../docs.json":1,"./controllers":14,"./db":17,"./modules":23}],22:[function(require,module,exports){
+},{"../docs.json":1,"./controllers":14,"./db":18,"./modules":24}],23:[function(require,module,exports){
 'use strict';
 
 module.exports = angular.module('bchz', ['ngRoute'])
@@ -1261,14 +1279,15 @@ module.exports = angular.module('bchz', ['ngRoute'])
     $routeProvider
       .when('/', { controller: 'HomeCtrl', templateUrl: '/views/home.html' })
       .when('/players/:name', { controller: 'PlayerCtrl', templateUrl: '/views/player.html' })
+      .when('/match/:id', { controller: 'MatchCtrl', templateUrl: '/views/match.html' })
       .when('/scorers', { controller: 'ScorersCtrl', templateUrl: '/views/scorers.html' })
       .when('/404', { templateUrl: '/site/404.html' })
       .otherwise({ templateUrl: '/site/404.html' });
   }]);
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = {
   bchz: require('./bchz.js')
 };
 
-},{"./bchz.js":22}]},{},[21]);
+},{"./bchz.js":23}]},{},[22]);
