@@ -7,7 +7,10 @@
     <label>Asistencias: {{assists}}</label>
   </li>
   <li>
-    <label>Partidos jugados: {{matches}}</label>
+    <label>Partidos jugados: {{matches.length}}</label>
+    <ul ng-repeat="match in matches">
+      <li><a href="#/matches/{{match.id}}">{{match.name}}</a></li>
+    </ul>
   </li>
   <li>
     <label>Promedio de gol: {{average}}</label>

@@ -44,7 +44,7 @@ function matches(results) {
           return;
         }
 
-        self.players = data.map(getPlayer);
+        self.players = data.map(function (player, ix) { return getPlayer(player, ix, match); });
         self.starters = self.players.filter(function (player) { return !player.substitute; });
         self.substitutes = self.players.filter(function (player) { return player.substitute; });
         self.teams = getTeams(self.starters);
@@ -96,7 +96,7 @@ function matches(results) {
       }).reduce(function (a, b) { return a + b; }, 0);
   }
 
-  function getPlayer (player, ix) {
+  function getPlayer (player, ix, match) {
     return {
       name: player.jugador,
       assists: (+player.asistencias),
@@ -107,7 +107,8 @@ function matches(results) {
       total: (+player.jugada + (+player.cabeza) + (+player.tirolibre) + (+player.penal)),
       own: (+player.encontra),
       team: player.equipo,
-      substitute: ix >= 22
+      substitute: ix >= 22,
+      match: match
     };
   }
 }

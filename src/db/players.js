@@ -14,7 +14,7 @@ function players(source) {
       return {
         name: player.key,
         goals: _(player).sum(function (item) { return item.total; }),
-        matches: player.where(function (item) { return !item.substitute; }).length,
+        matches: player.where(function (item) { return !item.substitute; }).select(function (item) { return item.match; }),
         assists: _(player).sum(function (item) { return item.assists; }),
         average: _(player).sum(function (item) { return item.total; }) / player.where(function (item) { return !item.substitute; }).length,
         detail: player

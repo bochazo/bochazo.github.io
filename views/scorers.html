@@ -13,7 +13,7 @@
     <tr ng-repeat="player in players">
       <td><a href="#/players/{{player.name}}">{{player.name}}</a></td>
       <td>{{player.goals}}</td>
-      <td>{{player.matches}}</td>
+      <td>{{player.matches.length}}</td>
       <td>{{player.average.toFixed(2)}}</td>
     </tr>
   </tbody>
