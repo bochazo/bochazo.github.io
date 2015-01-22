@@ -1,7 +1,7 @@
 <h2>Partido del día {{name}}</h2>
 
 <div ng-repeat="team in teams">
-  <h3>{{team.name}} - {{team.goals.count}}</h3>
+  <h3>{{team.name}} ({{team.goals.count}})</h3>
   <table class="table table-hover">
     <thead>
       <tr>
@@ -13,7 +13,7 @@
     <tbody>
       <tr ng-repeat="player in team.players">
         <td><a href="#/players/{{player.name}}">{{player.name}}</a></td>
-        <td>{{player.goals}}</td>
+        <td>{{player.total}}</td>
         <td>{{player.assists}}</td>
       </tr>
     </tbody>
