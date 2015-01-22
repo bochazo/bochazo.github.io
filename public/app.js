@@ -1214,7 +1214,7 @@ var _ = require('very-array');
 module.exports = players;
 
 function players(source) {
-  _(source)
+  return _(source)
     .selectMany(function (match) {
       return match.players;
     }).groupBy(function (player) {
