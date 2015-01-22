@@ -1,11 +1,11 @@
-<h2>Home</h2>
-<ul>
-  <li ng-repeat="match in matches">
-    <h2><a href="#/matches/{{match.id}}">{{match.name}}</a></h2>
+<h2>Partidos</h2>
+<div ng-repeat="match in matches">
+  <h3><a href="#/matches/{{match.id}}">{{match.name}}</a></h3>
 
-    <div ng-repeat="team in match.teams">
-      <h3>{{team.name}} - {{team.goals.count}}</h3>
-      <p><span ng-repeat="detail in team.goals.detail"><a href="#/players/{{detail.name}}">{{detail.name}}</a>{{detail.total > 1 ? ' (' + detail.total + ')' : ''}}{{detail.team !== team.name ? ' (EC)' : ''}}{{$last ? '' : ', '}}</span><p>
-    </div>
-  </li>
-</ul>
+  <ul ng-repeat="team in match.teams">
+    <li>
+      <h4>{{team.name}} - {{team.goals.count}}</h4>
+      <p><span ng-repeat="detail in team.goals.detail"><a href="#/players/{{detail.name}}">{{detail.name}}</a>{{detail.total > 1 ? ' (' + detail.total + ')' : ''}}{{detail.team !== team.name ? ' (EC)' : ''}}{{$last ? '' : ', '}}</span></p>
+    </li>
+  </ul>
+</div>
