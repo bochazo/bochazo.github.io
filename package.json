@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "test": "jshint . --reporter node_modules/jshint-stylish/stylish.js",
-    "bundle": "browserify -t brfs src/index.js -o public/app.js",
-    "start": "static-server & watchify -t brfs src/index.js -d -o public/app.js",
+    "bundle": "browserify src/index.js -o public/app.js",
+    "start": "static-server & watchify src/index.js -d -o public/app.js",
     "postinstall": "bower install"
   },
   "repository": {
@@ -27,11 +27,8 @@
   "dependencies": {
     "angular": "^1.3.8",
     "angular-route": "^1.3.8",
-    "brfs": "^1.2.0",
     "contra": "^1.8.0",
     "gsx": "^1.1.2",
-    "tableme": "^0.1.0",
-    "tabletop": "^1.3.5",
     "very-array": "^0.6.1"
   },
   "devDependencies": {
