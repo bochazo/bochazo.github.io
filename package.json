@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jshint . --reporter node_modules/jshint-stylish/stylish.js",
     "bundle": "browserify -t brfs src/index.js -o public/app.js",
-    "debug": "watchify -t brfs src/index.js -d -o public/app.js",
+    "start": "static-server & watchify -t brfs src/index.js -d -o public/app.js",
     "postinstall": "bower install"
   },
   "repository": {
@@ -39,6 +39,7 @@
     "browserify": "^8.1.0",
     "jshint": "^2.6.0",
     "jshint-stylish": "^1.0.0",
-    "watchify": "^2.2.1"
+    "watchify": "^2.2.1",
+    "static-server": "~2.0.0"
   }
 }
