@@ -13,6 +13,7 @@ function match($scope, $rootScope, $routeParams, $location, $window, db) {
 
     $scope.name = match.name;
     $scope.teams = match.teams;
+    $scope.players = match.players;
     $scope.$apply();
   });
 }
