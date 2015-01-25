@@ -5,6 +5,12 @@ var db = require('./db')(docs);
 var bchz = require('./modules').bchz;
 var controllers = require('./controllers');
 
+// jQuery
+global.jQuery = require('jQuery');
+
+// bootstrap navbar collapse
+require('bootstrap');
+
 bchz.value('db', db);
 bchz.controller('HomeCtrl', controllers.home);
 bchz.controller('PlayerCtrl', controllers.player);
