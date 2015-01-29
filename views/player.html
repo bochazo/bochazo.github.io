@@ -1,7 +1,7 @@
 <h2>{{name}}</h2>
 <ul>
   <li>
-    <label>Goles: {{goals}} ({{detail}})</label>
+    <label>Goles: {{goals}}{{detail ? ' (' + detail + ')' : ''}} </label>
   </li>
   <li>
     <label>Asistencias: {{assists}}</label>
